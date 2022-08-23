@@ -4,12 +4,11 @@
 
 class inFile {
 public:
-    inFile(std::string _path);
+    inFile(std::ifstream *_ifile);
     std::string readBlock(std::string blkname);
-    std::string getFileCon();
+    std::string getFileContents();
 
 private:
-    //std::string filePath;
     std::string fileContents;
-    std::ifstream ifile;
+    std::ifstream *ifile;
 };
