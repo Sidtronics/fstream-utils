@@ -1,14 +1,19 @@
 #pragma once
+
 #include <fstream>
+#include <sstream>
 #include <string>
 
-class inFile {
+class Fstrm {
 public:
-    inFile(std::ifstream *_ifile);
+    Fstrm(std::string _filename);
+
     std::string readBlock(std::string blkname);
-    std::string getFileContents();
+    void writeBlock(std::string blkname, std::string blk);
+    
+    void flush();
 
 private:
-    std::string fileContents;
-    std::ifstream *ifile;
+    std::stringstream fbuffer;
+    std::string filename;
 };
