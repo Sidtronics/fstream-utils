@@ -4,12 +4,15 @@
 #include <sstream>
 #include <string>
 
-class Fstrm {
+#define BLK_FAIL 1
+#define BLK_SUCCESS 0
+
+class Blkstream {
 public:
-    Fstrm(std::string _filename);
+    Blkstream(std::string _filename);
 
     std::string readBlock(std::string blkname);
-    void writeBlock(std::string blkname, std::string blk);
+    bool writeBlock(std::string blkname, std::string blk);
     
     void flush();
 

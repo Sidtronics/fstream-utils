@@ -3,14 +3,14 @@
 #include <fstream>
 #include <sstream>
 
-Fstrm::Fstrm(std::string _filename):
+Blkstream::Blkstream(std::string _filename):
 filename(_filename)
 {
     std::ifstream file(_filename);
     fbuffer << file.rdbuf();
 }
 
-std::string Fstrm::readBlock(std::string blkname){
+std::string Blkstream::readBlock(std::string blkname){
 
     fbuffer.clear();
     size_t initpos = fbuffer.tellg();
@@ -28,7 +28,7 @@ std::string Fstrm::readBlock(std::string blkname){
 
 }
 
-void Fstrm::writeBlock(std::string blkname, std::string blk){
+bool Blkstream::writeBlock(std::string blkname, std::string blk){
     
     blkname = "###" + blkname + "###";
 
@@ -40,15 +40,15 @@ void Fstrm::writeBlock(std::string blkname, std::string blk){
         fbuffer << "\n" + blkname + "\n" << blk;
         fbuffer << "\n" + blkname + "\n";
         fbuffer.seekp(initpos);
-
         this->flush();
 
+        return BLK_SUCCESS;
     }
 
-    else return;
+    else return BLK_FAIL;
 }
 
-void Fstrm::flush(){
+void Blkstream::flush(){
     std::ofstream out(filename, std::ios::trunc);
     out << fbuffer.rdbuf();
 }
