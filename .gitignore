@@ -12,6 +12,4 @@ CTestTestfile.cmake
 _deps
 
 /build
-main.cpp
-main
-txt
+/.cache

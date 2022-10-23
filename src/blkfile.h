@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include "block.h" 
 
 #define BLK_FAIL 1
 #define BLK_SUCCESS 0
@@ -16,7 +18,7 @@ public:
     
     void flush();
 
-private:
-    std::stringstream fbuffer;
+private: 
+    std::unordered_map<std::string, Block> blockmap;
     std::string filename;
 };
