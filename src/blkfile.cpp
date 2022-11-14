@@ -1,54 +1,73 @@
-#include "txtblocks.h"
+//blkfile.cpp
+#include "blkfile.h"
+#include "block.h"
 #include <cstddef>
 #include <fstream>
 #include <sstream>
+#include <string>
 
-Blkstream::Blkstream(std::string _filename):
+Blkfile::Blkfile(std::string _filename):
 filename(_filename)
 {
     std::ifstream file(_filename);
-    fbuffer << file.rdbuf();
-}
-
-std::string Blkstream::readBlock(std::string blkname){
-
-    fbuffer.clear();
-    size_t initpos = fbuffer.tellg();
-    fbuffer.seekg(0);
-
-    std::string line, blk = "";
-    blkname = "###" + blkname + "###";
-
-    while(std::getline(fbuffer, line)) if(line == blkname) break;
-    while(std::getline(fbuffer, line)) if(line == blkname) break; else blk += line + '\n';
+    std::stringstream file_ss;
+    file_ss << file.rdbuf();
+    file.close();
     
-    fbuffer.seekg(initpos);
 
-    return blk.erase(blk.length()-1);
-
-}
-
-bool Blkstream::writeBlock(std::string blkname, std::string blk){
+    //Store all block in a map.
+    std::string line;
+    const std::string blk_start = "BLK:", blk_end = "BLK;";
     
-    blkname = "###" + blkname + "###";
+    while(std::getline(file_ss, line)) {
 
-    if(fbuffer.str().find(blkname) == std::string::npos){
+        if(line.substr(0,4) == blk_start) {
 
-        fbuffer.clear();
-        size_t initpos = fbuffer.tellp();
-        fbuffer.seekp(0,std::ios_base::end);
-        fbuffer << "\n" + blkname + "\n" << blk;
-        fbuffer << "\n" + blkname + "\n";
-        fbuffer.seekp(initpos);
-        this->flush();
+            std::string blk_name = line.substr(4);
+            std::string blk;
 
-        return BLK_SUCCESS;
+            while(std::getline(file_ss, line) 
+                    && line.substr(0,4) != blk_end) {
+
+                blk += (line + '\n');
+            }
+
+            blk.pop_back();
+            blockmap[blk_name] = Block(blk_name, blk);
+        }
     }
-
-    else return BLK_FAIL;
 }
 
-void Blkstream::flush(){
-    std::ofstream out(filename, std::ios::trunc);
-    out << fbuffer.rdbuf();
+
+
+std::string Blkfile::readBlock(std::string blk_name) {
+    
+    if(blockmap.count(blk_name))
+        return blockmap[blk_name].getBlock();
+
+    else return "";
+    
+}
+
+void Blkfile::writeBlock(std::string blk_name, std::string blk,
+        bool overWrite)  {
+
+    if(!overWrite && blockmap.count(blk_name) == 1)
+        return;
+
+    else {
+        blockmap[blk_name].setBlock(blk);
+    }
+}
+
+void Blkfile::saveChanges() const {
+
+    std::ofstream file(filename, std::ios::trunc);
+    
+    for(auto it = blockmap.begin(); it != blockmap.end(); ++it) {
+        file << "BLK:" << it->first << '\n';
+        file << it->second.getBlock() << '\n' << "BLK;\n\n"; 
+    }
+    
+    file.close();
 }

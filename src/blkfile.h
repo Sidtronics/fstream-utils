@@ -1,3 +1,4 @@
+//blkfile.h
 #pragma once
 
 #include <fstream>
@@ -9,16 +10,17 @@
 #define BLK_FAIL 1
 #define BLK_SUCCESS 0
 
-class Blkstream {
+class Blkfile {
 public:
-    Blkstream(std::string _filename);
+    Blkfile(std::string _filename);
 
-    std::string readBlock(std::string blkname);
-    bool writeBlock(std::string blkname, std::string blk);
+    std::string readBlock(std::string blk_name);
+    void writeBlock(std::string blk_name, std::string blk,
+            bool overWrite);
     
-    void flush();
+    void saveChanges() const;
 
-private: 
+private:
     std::unordered_map<std::string, Block> blockmap;
     std::string filename;
 };
