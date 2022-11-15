@@ -1,5 +1,11 @@
 
-add_executable(readBlk readBlk.cpp)
-#add_executable(writeBlk writeBlk.cpp)
+set(TESTS 
+    readBlk 
+    writeBlk)
 
-target_link_libraries(readBlk txtblocks)
+foreach(TEST ${TESTS})
+    add_executable(${TEST} ${TEST}.cpp)
+    target_link_libraries(${TEST} txtblocks)
+endforeach()
+
+
